@@ -1,5 +1,6 @@
 package com.jj.jwt.config;
 
+import com.jj.jwt.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,19 +10,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("http = " + http);
         return http
+                .addFilterBefore(new MyFilter3(), BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors
                         .configurationSource(corsConfigurationSource)
