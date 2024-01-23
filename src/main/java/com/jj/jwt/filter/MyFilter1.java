@@ -1,11 +1,8 @@
 package com.jj.jwt.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class MyFilter1 implements Filter {
     @Override
