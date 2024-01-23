@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class PrincipalDetails implements UserDetails {
-    private User user;
+    private final User user;
+
+    public User getUser() {
+        return user;
+    }
 
     public PrincipalDetails(User user) {
         this.user = user;
@@ -52,16 +56,4 @@ public class PrincipalDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-//    public static class GrantedTest implements GrantedAuthority{
-//        private String auth;
-//
-//        public GrantedTest(String auth) {
-//            this.auth = auth;
-//        }
-//
-//        @Override
-//        public String getAuthority() {
-//            return auth;
-//        }
-//    }
 }
