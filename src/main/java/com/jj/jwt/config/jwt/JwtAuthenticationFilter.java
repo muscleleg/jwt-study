@@ -1,5 +1,7 @@
 package com.jj.jwt.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jj.jwt.config.auth.PrincipalDetails;
 import com.jj.jwt.model.User;
@@ -17,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 //스프링 시큐리티에서 UsernamePasswordAuthenticationFilter
 //login 요청해서 username, password 전송하면 UsernamePasswordAuthenticationFilter 필터가 작동함
@@ -44,13 +47,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             User user = om.readValue(request.getInputStream(), User.class);
             System.out.println(user);
             //시큐리티가 알아서 비밀번호 찾아서 검증
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
             //authentication 객체가 session영역에 저장됨 -> 로그인이 되었다는 뜻
             //내 로그인한 정보가 담김
             Authentication authentication = authenticationManager.authenticate(authenticationToken);//PrincipalDetailsService의 loadUserByUsername() 함수가 실행됨
-            PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
-            System.out.println("로그인 완료됨:"+principalDetails.getUser().getUsername());
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+            System.out.println("로그인 완료됨:" + principalDetails.getUser().getUsername());
 
             //authentication 객체가 session 영역에 저장을 해야하고 그 방법이 return 해주면됨
             //리턴의 이유는 권한 관리를 security가 대신 해주기 때문에 편하려고 하는거임
@@ -65,7 +68,34 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     //JWT 토큰을 만들어서 request 요청한 사용자에게 JWT 토큰을 response 해주면 됨
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
+
+        //RSA방식 아님, Hash 암호 방식
+        String jwtToken = JWT.create().withSubject(principalDetails.getPassword())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .withClaim("id", principalDetails.getUsername())
+                .withClaim("username", principalDetails.getUsername())
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        response.addHeader("Authorization", "Bearer " + jwtToken);
+        // 쿠키방식
+        // 유저네임, 패스워드 로그인 정상
+        // 서버쪽 세션ID 생성
+        // 클라이언트 쿠키 세션 ID를 응답
+        // 요청할 때마다 쿠키값 세션ID를 항상 들고 서버쪽으로 요청하기 때문에
+        // session.getAttribute
+        // 서버는 세션ID가 유효한지 판단해서 유효하면 인증이 필요한 페이지로 접근하게 하면 됨
+
+
+        //JWT
+        //유저네임, 패스워드 로그인 정상
+        //JWT 토큰을 생성
+        //클라이언트 쪽으로 JWT토큰을 응답
+
+        //요청할 때마다 JWT토큰을 가지고 요청
+        //서버는 JWT 토큰이 유효한지를 판단(필터를 만들어야함)
+
         System.out.println("successfulAuthentication 실행됨 : 인증이완료되었다는 뜻임");
-        super.successfulAuthentication(request, response, chain, authResult);
     }
 }
