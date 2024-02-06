@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         System.out.println("JwtAuthenticationFilter: 로그인 시도중");
+        // /login에 requestBody로 전송하면됨
         //1. username, password를 받음
         //2. authenticationManger로 로그인을 시도하면 PrincipalDetailsService가 호출됨 -> loadUserByUsername() 함수가 실행됨
 

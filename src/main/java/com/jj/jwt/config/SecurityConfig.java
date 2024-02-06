@@ -1,6 +1,8 @@
 package com.jj.jwt.config;
 
 import com.jj.jwt.config.jwt.JwtAuthenticationFilter;
+import com.jj.jwt.config.jwt.JwtAuthorizationFilter;
+import com.jj.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final UserRepository userRepository;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -30,6 +33,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인
                 .httpBasic(AbstractHttpConfigurer::disable) //헤더에 id pwd 넣어서 보내는것
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(),userRepository))
                 .authorizeHttpRequests((request) ->
                         request
                                 .requestMatchers("/api/v1/user/**").authenticated()

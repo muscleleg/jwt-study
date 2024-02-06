@@ -24,6 +24,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        //블로그에 정리해둠
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         user.getRoleList().forEach(r->
             authorities.add(() -> r)

@@ -9,6 +9,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class CorsConfig {
+    //https://docs.spring.io/spring-security/reference/servlet/integrations/cors.html
+    //최신 버전 부터는 cors filter가 아니라 corsConfiguration으로 작성해야함
     @Bean
     public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
@@ -21,4 +23,5 @@ public class CorsConfig {
         source.registerCorsConfiguration("/api/**", config);
         return source;
     }
+
 }
